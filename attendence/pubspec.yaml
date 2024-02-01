@@ -1,12 +1,10 @@
 name: attendence
 description: A new Flutter project.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.0+1
 
 environment:
   sdk: '>=3.1.1 <4.0.0'
-
 
 dependencies:
   flutter:
@@ -31,8 +29,8 @@ flutter:
         - asset: assets/fonts/montserrat_semibold.ttf
         - asset: assets/fonts/montserrat_regular.ttf
 
-
   assets:
     - assets/image/
     - assets/fonts/
     - assets/image/bg.jpg
+    - assets/image/ahs_bk.png

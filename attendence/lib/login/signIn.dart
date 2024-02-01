@@ -34,34 +34,21 @@ class _signInExampleExampleState extends State<signInExample> with TickerProvide
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          SizedBox.expand(
-            child: FittedBox(
-              fit: BoxFit.cover,
+      body: Center(
+        child: Stack(
+          children: <Widget>[
+            SizedBox.expand(
               child: Image.asset(
-                'assets/image/bg.jpg', // Replace with your image URL
-                width: double.infinity, // Set the initial width of the image
-                height: double.infinity, // Set the initial height of the image
+                'assets/image/bg.jpg',
+                width: double.infinity,
+                height: double.infinity,
                 fit: BoxFit.cover,
               ),
             ),
-          ),
-          //FURTHER IMPLEMENTATION
-        ],
+          ],
+        ),
       ),
     );
-  }
-
-  double getMarginTop(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    if (screenSize.shortestSide < 600) {
-      // This is a phone (iPhone or similar)
-      return 230.0; // Adjust the margin for iPhones
-    } else {
-      // This is a tablet (iPad or similar)
-      return 460.0; // Adjust the margin for iPads
-    }
   }
 
   double getTextSize(BuildContext context) {
@@ -74,5 +61,4 @@ class _signInExampleExampleState extends State<signInExample> with TickerProvide
       return 22; // Adjust the margin for iPads
     }
   }
-
 }
