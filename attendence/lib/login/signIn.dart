@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
 import '../Colours.dart';
+import '../dashboard/Dashboard.dart';
 
 class signIn extends StatelessWidget {
   const signIn({super.key});
@@ -36,84 +36,210 @@ class _signInExampleExampleState extends State<signInExample> with TickerProvide
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double halfScreenHeight = screenHeight / 2;
+
     return Scaffold(
-      body: Center(
+      resizeToAvoidBottomInset: false,
+      body: Container(
+        color: ColorConstants.litegrey,
         child: Stack(
           children: <Widget>[
             Container(
               width: double.infinity,
-              height: double.infinity,
-              child: Image.asset(
+              height: halfScreenHeight,
+          child:  ClipRRect(
+            borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(80),
+                bottomRight: Radius.circular(80),
+                topLeft: Radius.circular(0),
+                topRight: Radius.circular(0)),
+            child: Container(
+              color: ColorConstants.kPrimaryColor,
+             /* child: Image.asset(
                 'assets/image/bg.jpg',
                 fit: BoxFit.cover,
-                height: double.infinity,
-                width: double.infinity,
+              ),*/
+            ),
+          ),
+            ),
+            Container(
+              margin: EdgeInsets.fromLTRB(20.0, 120.0, 20.0, 20.0),
+              child: Image.asset(
+                'assets/image/ahsfull.png',
+                fit: BoxFit.cover,
                 alignment: Alignment.center,
               ),
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(10.0),
-                  alignment: Alignment.centerLeft,
-                  child: new Text("Employee Id/Email Id",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  child: _buildTextFieldWIthoutBorder(
-                    controller: nameController,
-                  ),
-                ),
-                Container(
-                    child: _buttons('Login', context)
-                ),
-              ],
+        Center(
+          child: Container(
+            width: double.infinity,
+            height: 200,
+            margin: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20.0), // Adjust the radius as needed
             ),
-           /* Container(
-              padding: EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                //color: ColorConstants.transparent,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(0),
-                  topRight: Radius.circular(0),
-                ),
-              ),
+            child:  ClipRRect(
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(10.0),
-                    alignment: Alignment.centerLeft,
-                    child: new Text("Employee Id/Email Id",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'Montserrat',
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20.0,0.0,20.0,0.0),
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      child: new Text("Employee Id/Email Id",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'Montserrat',
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                   ),
-                  Container(
-                    alignment: Alignment.center,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20.0,0.0,20.0,0.0),
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      child: _buildTextFieldWIthoutBorder(
+                        controller: nameController,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20.0,20.0,20.0,0.0),
+                    child: Container(
+                        child: _buttons('Login', context)
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+           /* Container(
+              margin: EdgeInsets.fromLTRB(20.0, 120.0, 20.0, 20.0),
+              child: Image.asset(
+                'assets/image/ahsfull.png',
+                fit: BoxFit.cover,
+                alignment: Alignment.center,
+              ),
+            ),
+            Container(
+              width: 100,
+              height: 100,
+              alignment: Alignment.center,
+              color: ColorConstants.listbg,
+              child:  ClipRRect(
+                borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20)),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    *//*Container(
+                    margin: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Color(0xFFF05A22),
+                      style: BorderStyle.solid,
+                      width: 1.0,
+                    ),
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),*//*
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20.0,0.0,20.0,0.0),
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        child: new Text("Employee Id/Email Id",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Montserrat',
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20.0,0.0,20.0,0.0),
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        child: _buildTextFieldWIthoutBorder(
+                          controller: nameController,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20.0,20.0,20.0,0.0),
+                      child: Container(
+                          child: _buttons('Login', context)
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),*/
+           /* Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                *//*Container(
+                    margin: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Color(0xFFF05A22),
+                      style: BorderStyle.solid,
+                      width: 1.0,
+                    ),
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),*//*
+                Padding(
+              padding: const EdgeInsets.fromLTRB(20.0,0.0,20.0,0.0),
+              child: Container(
+                alignment: Alignment.centerLeft,
+                child: new Text("Employee Id/Email Id",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Montserrat',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+      ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20.0,0.0,20.0,0.0),
+                  child: Container(
+                    alignment: Alignment.centerLeft,
                     child: _buildTextFieldWIthoutBorder(
                       controller: nameController,
                     ),
                   ),
-                  Container(
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20.0,20.0,20.0,0.0),
+                  child: Container(
                       child: _buttons('Login', context)
                   ),
-                ],
-              ),
+                ),
+              ],
             ),*/
           ],
         ),
@@ -127,22 +253,22 @@ class _signInExampleExampleState extends State<signInExample> with TickerProvide
     int? maxLines,
   }) {
     return Container(
-      padding: EdgeInsets.all(10.0),
       child: TextField(
         controller: controller,
         keyboardType: inputType,
         maxLines: maxLines,
         decoration: InputDecoration(
           enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: ColorConstants.kPrimaryColor,width: 0.5),
+            borderSide: BorderSide(color: Colors.black,width: 0.5),
           ),
           focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: ColorConstants.kPrimaryColor,width: 0.5),
+            borderSide: BorderSide(color: Colors.black,width: 0.5),
           ),
         ),
       ),
     );
   }
+
   Widget _buttons(name, BuildContext context) {
     return Center(
         child: ButtonBar(
@@ -156,7 +282,7 @@ class _signInExampleExampleState extends State<signInExample> with TickerProvide
                       fontSize: 16,
                       fontFamily: 'Montserrat',
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -168,7 +294,12 @@ class _signInExampleExampleState extends State<signInExample> with TickerProvide
                     ),
                   ),
                   onPressed: () {
-
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Dashboard(),
+                      ),
+                    );
                   },
                 )),
           ],
