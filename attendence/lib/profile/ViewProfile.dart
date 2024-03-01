@@ -1,6 +1,11 @@
+import 'dart:convert';
 import 'package:attendence/dashboard/Dashboard.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../Colours.dart';
+import '../model/profile/viewprofile.dart';
 
 class ViewProfile extends StatelessWidget {
   const ViewProfile({super.key});
@@ -22,10 +27,22 @@ class ViewProfileExample extends StatefulWidget {
 }
 
 class _ViewProfileState extends State<ViewProfileExample> with TickerProviderStateMixin {
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    getToken();
+  }
+
+  void getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isLoading = true;
+      final String token = prefs.getString('token').toString();
+      print(token);
+      Profile("IY01482",token);
+    });
   }
 
   @override
@@ -37,6 +54,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double halfScreenHeight = screenHeight / 4;
+    double ScreenHeight = screenHeight / 2;
 
     return Scaffold(
       appBar: AppBar(
@@ -62,12 +80,13 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
           ),
         ),
           backgroundColor: Colors.white,
-        centerTitle: true, // Center the title horizontally
+          centerTitle: true, // Center the title horizontally
       ),
-      body: SingleChildScrollView(
+      body: isLoading?
+        progressBar(context) : SingleChildScrollView(
         child: Stack(
             children: [
-        Container(
+              Container(
         width: double.infinity,
       height: halfScreenHeight,
       child:  ClipRRect(
@@ -119,9 +138,9 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
       ),
         ),
               Container(
-                margin: EdgeInsets.fromLTRB(20.0, 120.0, 20.0, 20.0),
+                margin: EdgeInsets.fromLTRB(20.0, 100.0, 20.0, 20.0),
                 width: double.infinity,
-                height: 300,
+                height: ScreenHeight,
                 decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20.0),
@@ -145,18 +164,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(20.0,20.0,20.0,0.0),
-                      child: new Text("IY01854",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'Montserrat',
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20.0,20.0,20.0,0.0),
+                      padding: const EdgeInsets.fromLTRB(20.0,5.0,20.0,0.0),
                       child: new Text("Senior Mobile Developer",
                         style: TextStyle(
                           fontSize: 16,
@@ -166,6 +174,37 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                         ),
                       ),
                     ),
+                    Container(
+                      width: double.infinity,
+                      height: 70,
+                      padding: const EdgeInsets.fromLTRB(20.0,20.0,20.0,0.0),
+                      child: Card(
+                        elevation: 4,
+                        child: Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Expanded(
+                                child: Image(
+                                    image: AssetImage(
+                                        'assets/image/icon_user_grey.png')),
+                              ),
+                              Container(
+                                height: 20,
+                                width: 2, // Adjust the thickness of the line
+                                color: Colors.grey, // Color of the vertical line
+                              ),
+                              Expanded(
+                                child: Image(
+                                    image: AssetImage(
+                                        'assets/image/icon_doc_gold.png')),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -182,7 +221,6 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                   ),
                 ),
               )
-
             ],
         )
        /* child: Stack(
@@ -315,5 +353,50 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
         ),*/
       ),
     );
+  }
+
+  Profile(String empId,String token) async {
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token
+    };
+    var data = json.encode({
+      "_empId": empId
+    });
+    var dio = Dio();
+    var response = await dio.request(
+      'https://ahsca7486d9b32c9b0ddevaos.axcloud.dynamics.com/api/services/AHSMobileServices/AHSMobileService/getProfile',
+      options: Options(
+        method: 'POST',
+        headers: headers,
+      ),
+      data: data,
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        isLoading = false;
+      });
+      viewprofile data = viewprofile.fromJson(response.data);
+      print(data.visa);
+      //_launchURL(data.visa);
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      print(response.statusMessage);
+    }
+  }
+
+  _launchURL(String mapurl) async {
+    await launchUrl(Uri.parse(mapurl));
+  }
+
+  Widget progressBar(BuildContext context) {
+    return Center(
+        child: CircularProgressIndicator(
+          color: ColorConstants.kPrimaryColor,
+          strokeWidth: 3,
+        ));
   }
 }

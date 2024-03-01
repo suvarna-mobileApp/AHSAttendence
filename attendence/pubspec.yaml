@@ -16,11 +16,50 @@ dependencies:
 
   google_maps_flutter: ^2.5.0
 
+  dio: ^5.4.0
+
+  http: ^1.1.0
+
+  retrofit: ^4.1.0
+
+  flutter_bloc: ^8.1.4
+
+  fluttertoast: ^8.2.4
+
+  json_annotation: ^4.8.1
+
+  built_value: ^8.9.0
+
+  provider: ^6.1.1
+
+  shared_preferences: ^2.2.2
+
+  flutter_local_notifications: ^9.3.2
+
+  file: ^6.1.4
+
+  location: ^5.0.3
+
+  url_launcher: ^6.1.14
+
+  flutter_downloader: ^1.11.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  flutter_geofence:
+
   flutter_lints: ^2.0.0
+
+  retrofit_generator: ^8.1.0
+
+  build_runner: ^2.4.8
+
+  json_serializable: ^6.7.1
+
+  built_value_generator: ^8.9.0
+
 
 flutter:
 
@@ -43,3 +82,9 @@ flutter:
     - assets/image/icon_bell.png
     - assets/image/icon_profile.png
     - assets/image/icon_profile1.png
+    - assets/image/user_attendence48.png
+    - assets/image/user_profile48.png
+    - assets/image/icon_doc_gold.png
+    - assets/image/icon_doc_grey.png
+    - assets/image/icon_user_gold.png
+    - assets/image/icon_user_grey.png
