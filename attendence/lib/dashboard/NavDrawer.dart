@@ -28,16 +28,7 @@ class NavDrawer extends StatelessWidget {
             leading: Icon(
               Icons.login_outlined,
             ),
-            title: const Text('Page 1'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.login_outlined,
-            ),
-            title: const Text('Page 2'),
+            title: const Text('Logout'),
             onTap: () {
               Navigator.pop(context);
             },
@@ -50,9 +41,9 @@ class NavDrawer extends StatelessWidget {
             applicationIcon: Icon(
               Icons.local_play,
             ),
-            applicationName: 'My Cool App',
-            applicationVersion: '1.0.25',
-            applicationLegalese: '© 2019 Company',
+            applicationName: 'AHS Properties',
+            applicationVersion: '1.0.0',
+            applicationLegalese: 'Time Attendence',
             aboutBoxChildren: [
               ///Content goes here...
             ],

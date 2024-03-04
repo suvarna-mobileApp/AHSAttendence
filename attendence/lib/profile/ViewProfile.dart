@@ -3,6 +3,7 @@ import 'package:attendence/dashboard/Dashboard.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timeline_tile/timeline_tile.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../Colours.dart';
 import '../model/profile/viewprofile.dart';
@@ -28,6 +29,20 @@ class ViewProfileExample extends StatefulWidget {
 
 class _ViewProfileState extends State<ViewProfileExample> with TickerProviderStateMixin {
   bool isLoading = false;
+  String imageUser = "assets/image/icon_user_gold.png";
+  String imageDoc = "assets/image/icon_doc_gold.png";
+  String userName = "";
+  String userDesignation = "-";
+  String userDepartment = "-";
+  String userMobile = "-";
+  String userEmailId = "-";
+  String userVisa = "";
+  String userEmirateId = "";
+  String userPassport = "";
+  String userMedical = "";
+  String userPhoto = "";
+  bool isVisibleProfile = true;
+  bool isVisibleDoc = false;
 
   @override
   void initState() {
@@ -40,8 +55,9 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
     setState(() {
       isLoading = true;
       final String token = prefs.getString('token').toString();
+      final String userName = prefs.getString('username').toString();
       print(token);
-      Profile("IY01482",token);
+      Profile(userName,token);
     });
   }
 
@@ -53,35 +69,11 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    double halfScreenHeight = screenHeight / 4;
-    double ScreenHeight = screenHeight / 2;
+    double halfScreenHeight = screenHeight / 6;
+    double ScreenHeight6 = screenHeight / 8;
+    double ScreenHeight4 = screenHeight / 3.5;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          color: ColorConstants.kPrimaryColor,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Dashboard(),
-              ),
-            );
-          },
-        ),
-        title: const Text(
-          'Profile',
-          style: TextStyle(
-            color: ColorConstants.kPrimaryColor,
-            fontFamily: 'Montserrat',// Text color
-            fontSize: 18, // Font size
-            fontWeight: FontWeight.bold, // Font weight
-          ),
-        ),
-          backgroundColor: Colors.white,
-          centerTitle: true, // Center the title horizontally
-      ),
       body: isLoading?
         progressBar(context) : SingleChildScrollView(
         child: Stack(
@@ -98,23 +90,22 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
           child: Container(
             color: ColorConstants.kPrimaryColor,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  width: 100,
-                  height: 100,
                   child: IconButton(
                     icon: Icon(Icons.arrow_back),
-                    color: ColorConstants.kPrimaryColor,
+                    color: Colors.black,
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Dashboard(),
+                        ),
+                      );
                     },
                   ),
                 ),
                 Container(
-                  width: 100,
-                  height: 100,
-                  child: Center(
                     child: new Text("PROFILE",
                       style: TextStyle(
                         fontSize: 16,
@@ -123,14 +114,6 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                         color: Colors.black,
                       ),
                     ),
-                  ),
-                ),
-                Container(
-                  width: 100,
-                  height: 100,
-                  child: Center(
-                    child: Text(''),
-                  ),
                 ),
               ],
             ),
@@ -138,22 +121,18 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
       ),
         ),
               Container(
-                margin: EdgeInsets.fromLTRB(20.0, 100.0, 20.0, 20.0),
+                margin: EdgeInsets.fromLTRB(20.0, ScreenHeight4, 20.0, 20.0),
                 width: double.infinity,
-                height: ScreenHeight,
-                decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20.0),
-              ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(20.0,20.0,20.0,0.0),
+                      padding: const EdgeInsets.fromLTRB(20.0,0.0,20.0,0.0),
                       child: Container(
                         alignment: Alignment.center,
-                        child: new Text("Suvarna Varadaraju",
+                        child: new Text(userName,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 18,
                             fontFamily: 'Montserrat',
@@ -165,7 +144,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                     ),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(20.0,5.0,20.0,0.0),
-                      child: new Text("Senior Mobile Developer",
+                      child: new Text(userDesignation,
                         style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'Montserrat',
@@ -177,7 +156,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                     Container(
                       width: double.infinity,
                       height: 70,
-                      padding: const EdgeInsets.fromLTRB(20.0,20.0,20.0,0.0),
+                      padding: const EdgeInsets.fromLTRB(10.0,20.0,10.0,0.0),
                       child: Card(
                         elevation: 4,
                         child: Padding(
@@ -186,35 +165,57 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Expanded(
-                                child: Image(
-                                    image: AssetImage(
-                                        'assets/image/icon_user_grey.png')),
-                              ),
+                          child: InkWell(onTap: (){
+                            changeImage("profile");
+                        },
+                          child: Image(
+                              image: AssetImage(imageUser)),
+                              )),
                               Container(
                                 height: 20,
                                 width: 2, // Adjust the thickness of the line
                                 color: Colors.grey, // Color of the vertical line
                               ),
                               Expanded(
+                                child: InkWell(onTap: (){
+                                  changeImage("doc");
+                                },
                                 child: Image(
                                     image: AssetImage(
-                                        'assets/image/icon_doc_gold.png')),
-                              ),
+                                        imageDoc)),
+                              )),
                             ],
                           ),
                         ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: isVisibleProfile,
+                      child: Container(
+                        child: straightLine()
+                    ),
+                    ),
+                    Visibility(
+                      visible: isVisibleDoc,
+                      child: Container(
+                          child: viewDocument()
                       ),
                     )
                   ],
                 ),
               ),
               Container(
-                margin: EdgeInsets.fromLTRB(20.0, 60.0, 20.0, 20.0),
+                margin: EdgeInsets.fromLTRB(20.0, ScreenHeight6, 20.0, 20.0),
                 child: Align(
-                  alignment: Alignment.topCenter,
+                  alignment: Alignment.topLeft,
                   child: SizedBox(
-                      child: CircleAvatar(
-                        radius: 80.0,
+                      child: userPhoto.isNotEmpty
+                          ? CircleAvatar(
+                        radius: 60,
+                        backgroundImage: MemoryImage(base64.decode(userPhoto.replaceAll(RegExp(r'\s+'), ''))),
+                      )
+                          : CircleAvatar(
+                        radius: 60,
                         backgroundColor: ColorConstants.kPrimaryColor,
                         backgroundImage: AssetImage('assets/image/icon_profile1.png'),
                       )
@@ -223,134 +224,6 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
               )
             ],
         )
-       /* child: Stack(
-          children: <Widget>[
-            Container(
-              width: double.infinity,
-              height: halfScreenHeight,
-              child:  ClipRRect(
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(80),
-                    bottomRight: Radius.circular(80),
-                    topLeft: Radius.circular(0),
-                    topRight: Radius.circular(0)),
-                child: Container(
-                  color: ColorConstants.kPrimaryColor,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        child: IconButton(
-                          icon: Icon(Icons.arrow_back),
-                          color: ColorConstants.kPrimaryColor,
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                      Container(
-                        width: 100,
-                        height: 100,
-                        child: Center(
-                          child: new Text("PROFILE",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 100,
-                        height: 100,
-                        child: Center(
-                          child: Text(''),
-                        ),
-                      ),
-                    ],
-                  ),
-                  *//* child: Image.asset(
-                'assets/image/bg.jpg',
-                fit: BoxFit.cover,
-              ),*//*
-                ),
-              ),
-            ),
-            Center(
-              child: Container(
-                width: double.infinity,
-                height: 300,
-                margin: EdgeInsets.fromLTRB(20.0, 60.0, 20.0, 20.0),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20.0), // Adjust the radius as needed
-                ),
-                child:  ClipRRect(
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(20),
-                      bottomRight: Radius.circular(20),
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20)),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Align(
-                        alignment: Alignment.topCenter,
-                        child: CircleAvatar(
-                          radius: 70,
-                          backgroundImage: AssetImage('assets/image/icon_profile1.png'),
-                          backgroundColor: ColorConstants.kPrimaryColor,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20.0,20.0,20.0,0.0),
-                        child: Container(
-                          alignment: Alignment.center,
-                          child: new Text("Suvarna Varadaraju",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20.0,20.0,20.0,0.0),
-                        child: new Text("IY01854",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20.0,20.0,20.0,0.0),
-                        child: new Text("Senior Mobile Developer",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),*/
       ),
     );
   }
@@ -378,6 +251,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
         isLoading = false;
       });
       viewprofile data = viewprofile.fromJson(response.data);
+      addUserData(data);
       print(data.visa);
       //_launchURL(data.visa);
     } else {
@@ -386,6 +260,21 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
       });
       print(response.statusMessage);
     }
+  }
+
+  void addUserData(viewprofile data) {
+    setState(() {
+      userName = data.Name;
+      userDesignation = data.designation;
+      userEmailId = data.emailid;
+      userDepartment = data.department;
+      userMobile = data.mobilenumber;
+      userVisa = data.visa;
+      userEmirateId = data.emiratedid;
+      userPassport = data.passport;
+      userMedical = data.medical;
+      userPhoto = data.photo;
+    });
   }
 
   _launchURL(String mapurl) async {
@@ -398,5 +287,524 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
           color: ColorConstants.kPrimaryColor,
           strokeWidth: 3,
         ));
+  }
+
+  Widget straightLine(){
+    return Container(
+      padding: EdgeInsets.fromLTRB(10.0,20.0,10.0,0.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          InkWell(
+              child: TimelineTile(
+                alignment: TimelineAlign.start,
+                lineXY: 0.7, // Adjust the position of the line if needed
+                afterLineStyle: const LineStyle(
+                  color: ColorConstants.kPrimaryColor, // Change the line color here
+                  thickness: 1, // Adjust the line thickness
+                ),
+                isFirst: true,
+                indicatorStyle: IndicatorStyle(
+                  width: 22,
+                  color: ColorConstants.kPrimaryColor,
+                ),
+                endChild: Container(
+                  margin: EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        userDepartment,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'Montserrat',
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 1), // Add some space between the text widgets
+                      Text(
+                        "Department",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontFamily: 'Montserrat',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                    ],
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 1.0),
+                ),
+              )
+          ),
+          InkWell(
+            child: TimelineTile(
+              alignment: TimelineAlign.start,
+              lineXY: 0.7,
+              beforeLineStyle: const LineStyle(
+                color: ColorConstants.kPrimaryColor, // Change the line color here
+                thickness: 1, // Adjust the line thickness
+              ),
+              afterLineStyle: const LineStyle(
+                color: ColorConstants.kPrimaryColor, // Change the line color here
+                thickness: 1, // Adjust the line thickness
+              ),
+              indicatorStyle: IndicatorStyle(
+                width: 22,
+                color: ColorConstants.kPrimaryColor,
+              ),
+              endChild: Container(
+                margin: EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child:  Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      userMobile,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontFamily: 'Montserrat',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 1), // Add some space between the text widgets
+                    Text(
+                      "Mobile Number",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontFamily: 'Montserrat',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ],
+                ),
+                padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 1.0),
+              ),
+            ),
+          ),
+          InkWell(
+            child: TimelineTile(
+              alignment: TimelineAlign.start,
+              lineXY: 0.7,
+              beforeLineStyle: const LineStyle(
+                color: ColorConstants.kPrimaryColor, // Change the line color here
+                thickness: 1, // Adjust the line thickness
+              ),
+              afterLineStyle: const LineStyle(
+                color: ColorConstants.kPrimaryColor, // Change the line color here
+                thickness: 1, // Adjust the line thickness
+              ),
+              isLast: true,
+              indicatorStyle: IndicatorStyle(
+                width: 22,
+                color: ColorConstants.kPrimaryColor,
+              ),
+              endChild: Container(
+                margin: EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      userEmailId,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontFamily: 'Montserrat',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 1), // Add some space between the text widgets
+                    Text(
+                      "Email Id",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontFamily: 'Montserrat',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ],
+                ),
+                padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 1.0),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget viewDocument(){
+    return Container(
+      padding: EdgeInsets.fromLTRB(10.0,10.0,10.0,0.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          InkWell(
+              onTap: () => {
+                if(userEmirateId.isNotEmpty){
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('No File',
+    style: TextStyle(color: Colors.black),),
+    backgroundColor: ColorConstants.kPrimaryColor,)
+    )
+                }else{
+    _launchURL(userEmirateId)
+    }
+
+              },
+              child: TimelineTile(
+                alignment: TimelineAlign.start,
+                lineXY: 0.7, // Adjust the position of the line if needed
+                afterLineStyle: const LineStyle(
+                  color: ColorConstants.kPrimaryColor, // Change the line color here
+                  thickness: 1, // Adjust the line thickness
+                ),
+                isFirst: true,
+                indicatorStyle: IndicatorStyle(
+                  width: 22,
+                  color: ColorConstants.kPrimaryColor,
+                ),
+                endChild: Container(
+                  margin: EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Card(
+                    elevation: 4,
+                    margin: EdgeInsets.all(5),
+                    child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                     Padding(
+                       padding: EdgeInsets.fromLTRB(10.0,5.0,0.0,10.0),
+                    child: Text(
+                        "EmiratesId.pdf",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'Montserrat',
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      ),
+                      SizedBox(height: 4),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(10.0,10.0,0.0,10.0),
+                    child : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          "VIEW",
+                          style: TextStyle(
+                            color: ColorConstants.kPrimaryColor,
+                            fontFamily: 'Montserrat',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "DOWNLOAD",
+                          style: TextStyle(
+                            color: ColorConstants.kPrimaryColor,
+                            fontFamily: 'Montserrat',
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ]
+                    )
+                  )
+                    ],
+                  ),
+                ),
+                  padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 1.0),
+                )
+              )
+          ),
+          InkWell(
+            onTap: () => {
+              if(userMedical.isNotEmpty){
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('No File',
+                      style: TextStyle(color: Colors.black),),
+                      backgroundColor: ColorConstants.kPrimaryColor,)
+                )
+              }else{
+                _launchURL(userMedical)
+              }
+            },
+            child: TimelineTile(
+              alignment: TimelineAlign.start,
+              lineXY: 0.7,
+              beforeLineStyle: const LineStyle(
+                color: ColorConstants.kPrimaryColor, // Change the line color here
+                thickness: 1, // Adjust the line thickness
+              ),
+              afterLineStyle: const LineStyle(
+                color: ColorConstants.kPrimaryColor, // Change the line color here
+                thickness: 1, // Adjust the line thickness
+              ),
+              indicatorStyle: IndicatorStyle(
+                width: 22,
+                color: ColorConstants.kPrimaryColor,
+              ),
+              endChild: Container(
+                margin: EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Card(
+                  elevation: 4,
+                  margin: EdgeInsets.all(5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(10.0,5.0,0.0,10.0),
+                        child: Text(
+                          "Medical.pdf",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Montserrat',
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Padding(
+                          padding: EdgeInsets.fromLTRB(10.0,5.0,0.0,10.0),
+                          child : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Text(
+                                  "VIEW",
+                                  style: TextStyle(
+                                    color: ColorConstants.kPrimaryColor,
+                                    fontFamily: 'Montserrat',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  "DOWNLOAD",
+                                  style: TextStyle(
+                                    color: ColorConstants.kPrimaryColor,
+                                    fontFamily: 'Montserrat',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ]
+                          )
+                      )
+                    ],
+                  ),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 1.0),
+              ),
+            ),
+          ),
+          InkWell(
+            onTap: () => {
+              if(userPassport.isNotEmpty){
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('No File',
+                      style: TextStyle(color: Colors.black),),
+                      backgroundColor: ColorConstants.kPrimaryColor,)
+                )
+              }else{
+                _launchURL(userPassport)
+              }
+
+            },
+            child: TimelineTile(
+              alignment: TimelineAlign.start,
+              lineXY: 0.7,
+              beforeLineStyle: const LineStyle(
+                color: ColorConstants.kPrimaryColor, // Change the line color here
+                thickness: 1, // Adjust the line thickness
+              ),
+              afterLineStyle: const LineStyle(
+                color: ColorConstants.kPrimaryColor, // Change the line color here
+                thickness: 1, // Adjust the line thickness
+              ),
+              indicatorStyle: IndicatorStyle(
+                width: 22,
+                color: ColorConstants.kPrimaryColor,
+              ),
+              endChild: Container(
+                margin: EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Card(
+                  elevation: 4,
+                  margin: EdgeInsets.all(5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(10.0,10.0,0.0,10.0),
+                        child: Text(
+                          "Visa.pdf",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Montserrat',
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Padding(
+                          padding: EdgeInsets.fromLTRB(10.0,10.0,0.0,10.0),
+                          child : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Text(
+                                  "VIEW",
+                                  style: TextStyle(
+                                    color: ColorConstants.kPrimaryColor,
+                                    fontFamily: 'Montserrat',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  "DOWNLOAD",
+                                  style: TextStyle(
+                                    color: ColorConstants.kPrimaryColor,
+                                    fontFamily: 'Montserrat',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ]
+                          )
+                      )
+                    ],
+                  ),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 1.0),
+              ),
+            ),
+          ),
+          InkWell(
+            onTap: () => {
+              if(userVisa.isNotEmpty){
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('No File',
+                      style: TextStyle(color: Colors.black),),
+                      backgroundColor: ColorConstants.kPrimaryColor,)
+                )
+              }else{
+                _launchURL(userVisa)
+              }
+            },
+            child: TimelineTile(
+              alignment: TimelineAlign.start,
+              lineXY: 0.7,
+              beforeLineStyle: const LineStyle(
+                color: ColorConstants.kPrimaryColor, // Change the line color here
+                thickness: 1, // Adjust the line thickness
+              ),
+              afterLineStyle: const LineStyle(
+                color: ColorConstants.kPrimaryColor, // Change the line color here
+                thickness: 1, // Adjust the line thickness
+              ),
+              isLast: true,
+              indicatorStyle: IndicatorStyle(
+                width: 22,
+                color: ColorConstants.kPrimaryColor,
+              ),
+              endChild: Container(
+                margin: EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Card(
+                  elevation: 4,
+                  margin: EdgeInsets.all(5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(10.0,5.0,0.0,10.0),
+                        child: Text(
+                          "Passport.pdf",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Montserrat',
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Padding(
+                          padding: EdgeInsets.fromLTRB(10.0,5.0,0.0,10.0),
+                          child : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Text(
+                                  "VIEW",
+                                  style: TextStyle(
+                                    color: ColorConstants.kPrimaryColor,
+                                    fontFamily: 'Montserrat',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  "DOWNLOAD",
+                                  style: TextStyle(
+                                    color: ColorConstants.kPrimaryColor,
+                                    fontFamily: 'Montserrat',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ]
+                          )
+                      )
+                    ],
+                  ),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 1.0),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void changeImage(String value) {
+    setState(() {
+      if(value == "profile"){
+        isVisibleProfile = true;
+        isVisibleDoc = false;
+        imageUser = 'assets/image/icon_user_gold.png';
+        imageDoc = "assets/image/icon_doc_gold.png";
+      }else if(value == "doc"){
+        isVisibleProfile = false;
+        isVisibleDoc = true;
+        imageUser = 'assets/image/icon_user_grey.png';
+        imageDoc = "assets/image/icon_doc_grey.png";
+      }
+    });
   }
 }

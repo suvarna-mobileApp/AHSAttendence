@@ -44,6 +44,8 @@ dependencies:
 
   flutter_downloader: ^1.11.2
 
+  timeline_tile: ^2.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -88,3 +90,5 @@ flutter:
     - assets/image/icon_doc_grey.png
     - assets/image/icon_user_gold.png
     - assets/image/icon_user_grey.png
+    - assets/image/user_location.png
+    - assets/image/user_request.png

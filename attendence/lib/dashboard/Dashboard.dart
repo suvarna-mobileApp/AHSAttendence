@@ -1,11 +1,17 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
+import 'package:attendence/dashboard/NewDashboard.dart';
+import 'package:attendence/model/location/SendLocationResponseModel.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Colours.dart';
+import '../myattendence/MyAttendence.dart';
 import '../profile/ViewProfile.dart';
 import 'NavDrawer.dart';
 
@@ -47,7 +53,7 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
   String checkedInText = "Punch-In";
   String checkedInTextDate = "Punch-In";
   bool showText = false;
-
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -268,35 +274,18 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
         centerTitle: true, // Center the title horizontally
         backgroundColor: Colors.white, // AppBar background color
       ),
-      body: SingleChildScrollView(
+      body: isLoading?
+      progressBar(context) :SingleChildScrollView(
         child: Column(
           children: <Widget>[
             Container(
               alignment: Alignment.topLeft,
-          margin: EdgeInsets.fromLTRB(20.0, 20, 20.0, 0),
+          margin: EdgeInsets.fromLTRB(10.0, 20, 10.0, 0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              InkWell(
-                child: Container(
-                    width: 100,
-                    height: 100,
-                    child: Image.asset(
-                      'assets/image/icon_profile1.png',
-                      fit: BoxFit.cover,
-                    )
-                ),
-                  onTap: () => {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ViewProfile(),
-                      ),
-                    ),
-                  }
-              ),
               Container(
-                margin: EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 0.0),
+                //margin: EdgeInsets.fromLTRB(10.0, 10.0, 0.0, 0.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -314,7 +303,7 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
                       padding: const EdgeInsets.all(5.0),
                     ),
                     Container(
-                      child: Text(currentDate,
+                      child: Text(currentDate + " , " + currentTime,
                         style: TextStyle(
                           fontSize: 14,
                           fontFamily: 'Montserrat',
@@ -326,30 +315,69 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
                     Padding(
                       padding: const EdgeInsets.all(4.0),
                     ),
-                    Container(
-                      child: new Text(currentTime,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontFamily: 'Montserrat',
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(5.0),
-                    ),
                   ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.fromLTRB(10.0,10.0,10.0,10.0),
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    elevation: 4,
+                    primary: Colors.black,
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  onPressed: () {
+                    isLoading = true;
+                    if(checkedInText == "Punch-In"){
+                      sendLocationToServer("IY01482", "DAMAC", "Y");
+                      //showText = true;
+                      //_checkIn(context);
+                      //checkedInText = "Punch-Out";
+                      //checkedInTextDate = 'Punched In Damac Executive heights \n' + currentDate + " " + currentTime;
+                      //changeName(checkedInText,checkedInTextDate);
+                    }else if(checkedInText == "Punch-Out"){
+                      sendLocationToServer("IY01482", "DAMAC", "");
+                      //showText = true;
+                      //checkIn(context);
+                      //checkedInTextDate = 'Punched Out Damac Executive heights \n' + currentDate + " " + currentTime;
+                      //checkedInText = "Punch-In";
+                      //changeName(checkedInText,checkedInTextDate);
+                    }
+                  },
+                  child: Text(
+                    'Punch-In',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
       ),
-            Center(child: Column(children: [
+            if (showText)
+              Align(
+                alignment: Alignment.topLeft,
+                child: _checkIn(context),
+              ),
+            Center(child:
+            Column(children: [
               Row(children: [ Expanded(child: InkWell(onTap: (){
-               // Navigator.push(context, MaterialPageRoute(builder: (context)=>ConfigRetrive(sessionId: sessionId,mobilenum : mobileNumberValue)));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NewDashboard(),
+                  ),
+                );
               },child: Card(
-                margin: EdgeInsets.all(5),
+                margin: EdgeInsets.all(10),
                 child: ClipPath(
                   child: Container(
                     padding: EdgeInsets.all(16),
@@ -362,11 +390,11 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
                         children: [Padding(padding: EdgeInsets.all(10),
                             child: Image(
                                 image: AssetImage(
-                                    'assets/image/user_attendence48.png'))),
+                                    'assets/image/user_location.png'))),
                           Padding(padding: EdgeInsets.all(10),
                               child: Text(
                                   'My Location',
-                                  style: TextStyle(fontSize: 18)))
+                                  style: TextStyle(fontSize: 16)))
                         ])
                     ),
                   ),
@@ -374,8 +402,15 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(3))),
                 ),
-              ))), Expanded(flex: 1, child: Card(
-                margin: EdgeInsets.all(5),
+              ))), Expanded(flex: 1, child: InkWell(onTap: (){
+    Navigator.push(
+    context,
+    MaterialPageRoute(
+    builder: (context) => MyAttendence(),
+    ),
+    );
+    },child: Card(
+                margin: EdgeInsets.all(10),
                 child: ClipPath(
                   child: Container(
                     padding: EdgeInsets.all(16),
@@ -392,14 +427,14 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
                           Padding(padding: EdgeInsets.all(10),
                               child: Text(
                                   'My Attendence',
-                                  style: TextStyle(fontSize: 18)))
+                                  style: TextStyle(fontSize: 16)))
                         ])
                     ),
                   ),
                   clipper: ShapeBorderClipper(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(3))),
-                ),))
+                ),))),
               ]),
             ])),
             Center(child: Column(children: [
@@ -411,7 +446,7 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
                   ),
                 );
               },child: Card(
-                  margin: EdgeInsets.all(5),
+                  margin: EdgeInsets.all(10),
                 child: ClipPath(
                   child: Container(
                     padding: EdgeInsets.all(16),
@@ -429,7 +464,7 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
                             Padding(padding: EdgeInsets.all(10),
                                 child: Text(
                                     'My Profile',
-                                    style: TextStyle(fontSize: 18)))
+                                    style: TextStyle(fontSize: 16)))
                           ])
                       ),
                   ),
@@ -438,7 +473,7 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
                           borderRadius: BorderRadius.circular(3))),
                 ),
               ))), Expanded(flex: 1, child: Card(
-                margin: EdgeInsets.all(5),
+                margin: EdgeInsets.all(10),
                 child: ClipPath(
                   child: Container(
                     padding: EdgeInsets.all(16),
@@ -451,11 +486,11 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
                         children: [Padding(padding: EdgeInsets.all(10),
                             child: Image(
                                 image: AssetImage(
-                                    'assets/image/user_profile48.png'))),
+                                    'assets/image/user_request.png'))),
                           Padding(padding: EdgeInsets.all(10),
                               child: Text(
                                   'My Request',
-                                  style: TextStyle(fontSize: 18)))
+                                  style: TextStyle(fontSize: 16)))
                         ])
                     ),
                   ),
@@ -501,53 +536,62 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
     );
   }
 
-  Widget _buttons(name, BuildContext context) {
-    return Center(
-        child: ButtonBar(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ButtonTheme(
-                minWidth: 200,
-                child: ElevatedButton(
-                  child: new Text(name,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    elevation: 4,
-                    primary: ColorConstants.kPrimaryColor,
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                  ),
-                  onPressed: () {
-                    if(checkedInText == "Punch-In"){
-                      showText = true;
-                      _checkIn(context);
-                      checkedInText = "Punch-Out";
-                      checkedInTextDate = 'Punched In Damac Executive heights \n' + currentDate + " " + currentTime;
-                      changeName(checkedInText,checkedInTextDate);
-                    }else if(checkedInText == "Punch-Out"){
-                      showText = true;
-                      _checkIn(context);
-                      checkedInTextDate = 'Punched Out Damac Executive heights \n' + currentDate + " " + currentTime;
-                      checkedInText = "Punch-In";
-                      changeName(checkedInText,checkedInTextDate);
-                    }
-                  },
-                )),
-          ],
-        ));
+  sendLocationToServer(String empId,String location,String status) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String token = prefs.getString('token').toString();
+
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token
+    };
+    var data = json.encode({
+      "_employeeID": empId,
+      "_location": location,
+      "_status": status
+    });
+    var dio = Dio();
+    var response = await dio.request(
+      'https://ahsca7486d9b32c9b0ddevaos.axcloud.dynamics.com/api/services/AHSMobileServices/AHSMobileService/setLocation',
+      options: Options(
+        method: 'POST',
+        headers: headers,
+      ),
+      data: data,
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        isLoading = false;
+      });
+      SendLocationResponseModel data = SendLocationResponseModel.fromJson(response.data);
+      if(data.result == true){
+        if(checkedInText == "Punch-In"){
+          //sendLocationToServer("IY01482", "DAMAC", "Y");
+          showText = true;
+          _checkIn(context);
+          checkedInText = "Punch-Out";
+          checkedInTextDate = 'Punched In Damac Executive heights \n' + currentDate + " " + currentTime;
+          changeName(checkedInText,checkedInTextDate);
+        }else if(checkedInText == "Punch-Out"){
+          //sendLocationToServer("IY01482", "DAMAC", "");
+          showText = true;
+          _checkIn(context);
+          checkedInTextDate = 'Punched Out Damac Executive heights \n' + currentDate + " " + currentTime;
+          checkedInText = "Punch-In";
+          changeName(checkedInText,checkedInTextDate);
+        }
+      }
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      print(response.statusMessage);
+    }
   }
 
   Widget _checkIn(BuildContext context) {
-    return Center(
-        child: Container(
+    return Container(
+      margin: EdgeInsets.fromLTRB(10.0, 20, 10.0, 20.0),
           child: new Text(checkedInTextDate,
             style: TextStyle(
               fontSize: 16,
@@ -556,7 +600,6 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
               color: Colors.black,
             ),
           ),
-        ),
     );
   }
 
@@ -575,5 +618,13 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
       // This is a tablet (iPad or similar)
       return 22; // Adjust the margin for iPads
     }
+  }
+
+  Widget progressBar(BuildContext context) {
+    return Center(
+        child: CircularProgressIndicator(
+          color: ColorConstants.kPrimaryColor,
+          strokeWidth: 3,
+        ));
   }
 }

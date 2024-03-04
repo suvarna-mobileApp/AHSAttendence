@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import '../Colours.dart';
 import '../profile/ViewProfile.dart';
+import 'Dashboard.dart';
 import 'NavDrawer.dart';
 
 class NewDashboard extends StatelessWidget {
@@ -37,13 +38,14 @@ class _DashboardExampleState extends State<NewDashboardExample> with TickerProvi
   late LatLng showLocation = const LatLng(25.09554209900229, 55.17285329480057);
   double damaclat = 25.09554209900229;
   double damaclong = 55.17285329480057;
-  double salelat = 25.09554209900229;
-  double salelonf = 25.09554209900229;
+  double salelat = 25.2041855;
+  double salelonf = 55.2628803;
   late LocationData currentLocation;
   Location location = Location();
   late StreamSubscription<LocationData> _locationSubscription;
   final Set<Marker> markers = new Set();
-  Set<Circle> circles = new Set();
+  Set<Circle> circlesDamac = new Set();
+  Set<Circle> circlesSaleCenter = new Set();
   String checkedInText = "Punch-In";
   String checkedInTextDate = "Punch-In";
   bool showText = false;
@@ -58,7 +60,8 @@ class _DashboardExampleState extends State<NewDashboardExample> with TickerProvi
     flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: null);
 
     getCurrentLocation();
-    getCircle();
+    getCircleDamac();
+    getCircleSaleCenter();
     getmarkers();
   }
 
@@ -77,6 +80,7 @@ class _DashboardExampleState extends State<NewDashboardExample> with TickerProvi
 
   void getCurrentLocation() async{
     Location location = Location();
+    currentLocation = await location.getLocation();
     location.getLocation().then((value){
       currentLocation = value;
       /// add Markers for current location
@@ -208,27 +212,90 @@ class _DashboardExampleState extends State<NewDashboardExample> with TickerProvi
     return markers;
   }
 
-  Set<Circle> getCircle() {
+  Set<Circle> getCircleDamac() {
     setState(() {
-      circles = Set.from([
+      circlesDamac = Set.from([
         Circle(
           circleId: CircleId('geo_fence_1'),
           center: LatLng(damaclat, damaclong),
           radius: 200,
           strokeWidth: 2,
-          strokeColor: ColorConstants.lite_gold,
+          strokeColor: ColorConstants.kPrimaryColor,
           fillColor: ColorConstants.kPrimaryColor.withOpacity(0.15),
         ),
       ]);
     });
 
-    return circles;
+    return circlesDamac;
+  }
+
+  Set<Circle> getCircleSaleCenter() {
+    setState(() {
+      circlesSaleCenter = Set.from([
+        Circle(
+          circleId: CircleId('geo_fence_1'),
+          center: LatLng(salelat, salelonf),
+          radius: 200,
+          strokeWidth: 2,
+          strokeColor: ColorConstants.kPrimaryColor,
+          fillColor: ColorConstants.kPrimaryColor.withOpacity(0.15),
+        ),
+      ]);
+    });
+
+    return circlesSaleCenter;
   }
 
   @override
   void dispose() {
     super.dispose();
   }
+
+ /* @override
+  Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double halfScreenHeight = screenHeight / 4;
+
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: Center(
+        child: Column(
+          children: <Widget>[
+            Container(
+              width: double.infinity,
+              height: double.infinity,
+              margin: EdgeInsets.fromLTRB(20.0, 40.0, 20.0, 20.0),
+              child: GoogleMap( //Map widget from google_maps_flutter package
+                zoomGesturesEnabled: true, //enable Zoom in, out on map
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(currentLocation.latitude! , currentLocation.longitude!,),//innital position in map
+                  //target: showLocation, //initial position
+                  zoom: 16.0, //initial zoom level
+                ),
+                markers: getmarkers(),
+                circles: circles,//markers to show on map
+                mapType: MapType.normal, //map type
+                onMapCreated: (GoogleMapController controller) { //method called when map is created
+                  setState(() {
+                    mapController = controller;
+                  });
+                },
+              ),
+            ),
+           *//* Align(
+                alignment: Alignment.bottomCenter,
+                child: _buttons(checkedInText,context)
+            ),
+            if (showText)
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: _checkIn(context),
+              ),*//*
+          ],
+        ),
+      ),
+    );
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -238,153 +305,74 @@ class _DashboardExampleState extends State<NewDashboardExample> with TickerProvi
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        iconTheme: IconThemeData(color: ColorConstants.kPrimaryColor),
-        /*leading: IconButton(
-          icon: Icon(Icons.menu_rounded),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
           color: ColorConstants.kPrimaryColor,
           onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Dashboard(),
+              ),
+            );
           },
-        ),*/
+        ),
         title: const Text(
-          'Dashboard',
+          'My Location',
           style: TextStyle(
-            color: Colors.black,
+            color: ColorConstants.kPrimaryColor,
             fontFamily: 'Montserrat',// Text color
             fontSize: 18, // Font size
             fontWeight: FontWeight.bold, // Font weight
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications_active),
-            color: ColorConstants.kPrimaryColor,
-            onPressed: () {
-              scheduleNotification(
-                  "Georegion added", "Your geofence has been added! - damac");
-              // Add button press logic here
-            },
-          ),
-        ],
-        backgroundColor: ColorConstants.kPrimaryColor, // AppBar background color
+        backgroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        child: Stack(
-          children: <Widget>[
-            Container(
-              width: double.infinity,
-              height: halfScreenHeight,
-              child:  ClipRRect(
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(0),
-                    bottomRight: Radius.circular(0),
-                    topLeft: Radius.circular(0),
-                    topRight: Radius.circular(0)),
-                child: Container(
-                  color: ColorConstants.kPrimaryColor,
-                  /* child: Image.asset(
-                'assets/image/bg.jpg',
-                fit: BoxFit.cover,
-              ),*/
+      body: GoogleMap( //Map widget from google_maps_flutter package
+                zoomGesturesEnabled: true, //enable Zoom in, out on map
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(currentLocation.latitude! , currentLocation.longitude!,),//innital position in map
+                  zoom: 16.0, //initial zoom level
                 ),
-              ),
-            ),
-            Container(
-              alignment: Alignment.topLeft,
-              margin: EdgeInsets.fromLTRB(20.0, 40.0, 20.0, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  InkWell(
-                      child: Container(
-                          width: 100,
-                          height: 100,
-                          child: Image.asset(
-                            'assets/image/icon_profile1.png',
-                            fit: BoxFit.cover,
-                          )
-                      ),
-                      onTap: () => {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ViewProfile(),
-                          ),
-                        ),
-                      }
-                  ),
-                  Container(
-                    margin: EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 0.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          child: Text("Suvarna",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(5.0),
-                        ),
-                        Container(
-                          child: Text(currentDate,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                        ),
-                        Container(
-                          child: new Text(currentTime,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(5.0),
-                        ),
-                        InkWell(
-                            child: Container(
-                              child: new Text("View Profile",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontFamily: 'Montserrat',
-                                  fontWeight: FontWeight.w600,
-                                  color: ColorConstants.kPrimaryColor,
-                                ),
-                              ),
-                            ),
-                            onTap: () => {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ViewProfile(),
-                                ),
-                              ),
-                            }
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+                //markers: getmarkers(),
+                markers: LatLng(currentLocation.latitude! , currentLocation.longitude!,) != null
+      ? {
+      Marker(
+      markerId: MarkerId("current_location"),
+      position: LatLng(currentLocation.latitude! , currentLocation.longitude!,),
+      infoWindow: InfoWindow(
+      title: "Current Location",
       ),
+      ),
+      }
+              : {},
+                //circles: circlesDamac,
+     circles: {
+          Circle(
+            circleId: CircleId("circle_current_location"),
+            center: LatLng(damaclat, damaclong),
+            radius: 200,
+            strokeWidth: 2,
+            strokeColor: ColorConstants.kPrimaryColor,
+            fillColor: ColorConstants.kPrimaryColor.withOpacity(0.15),
+          ),
+          Circle(
+            circleId: CircleId("circle_second_location"),
+            center: LatLng(salelat, salelonf),
+            radius: 200,
+            strokeWidth: 2,
+            strokeColor: ColorConstants.kPrimaryColor,
+            fillColor: ColorConstants.kPrimaryColor.withOpacity(0.15),
+          ),
+        },
+
+                mapType: MapType.normal, //map type
+                onMapCreated: (GoogleMapController controller) { //method called when map is created
+                  setState(() {
+                    mapController = controller;
+                  });
+                },
+              ),
     );
   }
 

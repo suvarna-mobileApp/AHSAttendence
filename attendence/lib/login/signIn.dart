@@ -344,8 +344,8 @@ class _signInExampleExampleState extends State<signInExample> with TickerProvide
       print(data.result);
       if(data.result == true){
         prefs = await SharedPreferences.getInstance();
+        await prefs.setString('username', userName);
         await prefs.setBool('firstLogin', true);
-        Navigator.of(context).pop();
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -354,7 +354,7 @@ class _signInExampleExampleState extends State<signInExample> with TickerProvide
         );
       }else{
         setState(() {
-          isLoading = true;
+          isLoading = false;
         });
         Fluttertoast.showToast(
             msg: "Incorrect Username or Password",
@@ -367,7 +367,7 @@ class _signInExampleExampleState extends State<signInExample> with TickerProvide
       }
     } else {
       setState(() {
-        isLoading = true;
+        isLoading = false;
       });
       print(response.statusMessage);
     }
