@@ -183,6 +183,7 @@ class _signInExampleExampleState extends State<signInExample> with TickerProvide
       child: TextField(
         controller: controller,
         keyboardType: inputType,
+        textInputAction: TextInputAction.done,
         maxLines: maxLines,
         decoration: InputDecoration(
           enabledBorder: OutlineInputBorder(
