@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Colours.dart';
@@ -210,8 +211,19 @@ class _MyAttendenceExampleState extends State<MyAttendenceExample> with TickerPr
       //Map<String, List<CheckInList>> parsedData = parseData(response.data);
 
       GetAttendenceListViewModel data = GetAttendenceListViewModel.fromJson(response.data);
-      attendneceList = data.checkInList!;
-      print(attendneceList);
+      if(data.checkInList != null){
+        attendneceList = data.checkInList!;
+        print(attendneceList);
+      }else{
+        Fluttertoast.showToast(
+            msg: "No Data Found",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }
     } else {
       setState(() {
         isLoading = false;
