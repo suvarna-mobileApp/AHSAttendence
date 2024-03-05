@@ -40,7 +40,7 @@ class _DashboardExampleState extends State<NewDashboardExample> with TickerProvi
   double damaclong = 55.17285329480057;
   double salelat = 25.2041855;
   double salelonf = 55.2628803;
-  late LocationData currentLocation;
+  LocationData? currentLocation;
   Location location = Location();
   late StreamSubscription<LocationData> _locationSubscription;
   final Set<Marker> markers = new Set();
@@ -84,7 +84,7 @@ class _DashboardExampleState extends State<NewDashboardExample> with TickerProvi
     location.getLocation().then((value){
       currentLocation = value;
       /// add Markers for current location
-      addCurrentLocMarker(currentLocation);
+      addCurrentLocMarker(currentLocation!);
     });
 
     _locationSubscription = location.onLocationChanged.listen((newLoc) {
@@ -331,15 +331,15 @@ class _DashboardExampleState extends State<NewDashboardExample> with TickerProvi
       body: GoogleMap( //Map widget from google_maps_flutter package
                 zoomGesturesEnabled: true, //enable Zoom in, out on map
                 initialCameraPosition: CameraPosition(
-                  target: LatLng(currentLocation.latitude! , currentLocation.longitude!,),//innital position in map
+                  target: LatLng(currentLocation!.latitude! , currentLocation!.longitude!,),//innital position in map
                   zoom: 16.0, //initial zoom level
                 ),
                 //markers: getmarkers(),
-                markers: LatLng(currentLocation.latitude! , currentLocation.longitude!,) != null
+                markers: LatLng(currentLocation!.latitude! , currentLocation!.longitude!,) != null
       ? {
       Marker(
       markerId: MarkerId("current_location"),
-      position: LatLng(currentLocation.latitude! , currentLocation.longitude!,),
+      position: LatLng(currentLocation!.latitude! , currentLocation!.longitude!,),
       infoWindow: InfoWindow(
       title: "Current Location",
       ),

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:attendence/dashboard/NewDashboard.dart';
+import 'package:attendence/login/signIn.dart';
 import 'package:attendence/model/location/SendLocationResponseModel.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Colours.dart';
+import '../model/profile/viewprofile.dart';
 import '../myattendence/MyAttendence.dart';
 import '../profile/ViewProfile.dart';
 import 'NavDrawer.dart';
@@ -54,10 +56,17 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
   String checkedInTextDate = "Punch-In";
   bool showText = false;
   bool isLoading = false;
+  String empId = "";
+  String userName = "";
+  String userMobile = "-";
+  String  token = "";
+  String userPhoto = "";
+  late SharedPreferences prefs;
 
   @override
   void initState() {
     super.initState();
+    getToken();
     var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
     var initializationSettingsIOS = IOSInitializationSettings(onDidReceiveLocalNotification: null);
     var initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
@@ -67,6 +76,51 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
     getCircle();
     getmarkers();
   }
+
+  void getToken() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isLoading = true;
+      empId = prefs.getString('username').toString();
+      token = prefs.getString('token').toString();
+      Profile(empId,token);
+    });
+  }
+
+  Profile(String empId,String token) async {
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token
+    };
+    var data = json.encode({
+      "_empId": empId
+    });
+    var dio = Dio();
+    var response = await dio.request(
+      'https://ahsca7486d9b32c9b0ddevaos.axcloud.dynamics.com/api/services/AHSMobileServices/AHSMobileService/getProfile',
+      options: Options(
+        method: 'POST',
+        headers: headers,
+      ),
+      data: data,
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        isLoading = false;
+      });
+      viewprofile data = viewprofile.fromJson(response.data);
+      userName = data.Name;
+      userMobile = data.mobilenumber;
+      userPhoto = data.photo;
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      print(response.statusMessage);
+    }
+  }
+
 
   addCurrentLocMarker(LocationData locationData){
     /// Current Location marker, that will also be updating
@@ -235,6 +289,16 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
     super.dispose();
   }
 
+  Future<void> _removeValue() async {
+    await prefs.remove('username');
+    await prefs.remove('firstLogin');
+    await prefs.remove("token");
+    setState(() {
+      empId = '';
+      token = "";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -242,7 +306,70 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      drawer: NavDrawer(),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+             UserAccountsDrawerHeader(
+              decoration: BoxDecoration(color: ColorConstants.kPrimaryColor),
+              accountName: Text(
+                userName,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              accountEmail: Text(
+                userMobile,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              currentAccountPicture: SizedBox(
+      child: userPhoto.isNotEmpty
+      ? CircleAvatar(
+        radius: 60,
+        backgroundImage: MemoryImage(base64.decode(userPhoto.replaceAll(RegExp(r'\s+'), ''))),
+      )
+          : CircleAvatar(
+      radius: 60,
+      backgroundColor: ColorConstants.kPrimaryColor,
+      backgroundImage: AssetImage('assets/image/icon_profile1.png'),
+    )
+    ),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.login_outlined,
+              ),
+              title: const Text('Logout'),
+              onTap: () {
+                _removeValue();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => signIn()
+                  ),
+                );
+              },
+            ),
+            AboutListTile( // <-- SEE HERE
+              icon: Icon(
+                Icons.info,
+              ),
+              child: Text('About app'),
+              applicationIcon: Icon(
+                Icons.local_play,
+              ),
+              applicationName: 'AHS Properties',
+              applicationVersion: '1.0.0',
+              applicationLegalese: 'Time Attendence',
+              aboutBoxChildren: [
+                ///Content goes here...
+              ],
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         iconTheme: IconThemeData(color: ColorConstants.kPrimaryColor),
         /*leading: IconButton(
@@ -290,7 +417,8 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      child: Text("Suvarna",
+                      width: 200,
+                      child: Text(userName,
                         style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'Montserrat',
@@ -334,22 +462,12 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
                     isLoading = true;
                     if(checkedInText == "Punch-In"){
                       sendLocationToServer("IY01482", "DAMAC", "Y");
-                      //showText = true;
-                      //_checkIn(context);
-                      //checkedInText = "Punch-Out";
-                      //checkedInTextDate = 'Punched In Damac Executive heights \n' + currentDate + " " + currentTime;
-                      //changeName(checkedInText,checkedInTextDate);
                     }else if(checkedInText == "Punch-Out"){
                       sendLocationToServer("IY01482", "DAMAC", "");
-                      //showText = true;
-                      //checkIn(context);
-                      //checkedInTextDate = 'Punched Out Damac Executive heights \n' + currentDate + " " + currentTime;
-                      //checkedInText = "Punch-In";
-                      //changeName(checkedInText,checkedInTextDate);
                     }
                   },
                   child: Text(
-                    'Punch-In',
+                    checkedInText,
                     style: TextStyle(
                       fontSize: 16,
                       fontFamily: 'Montserrat',
@@ -566,14 +684,12 @@ class _DashboardExampleState extends State<DashboardExample> with TickerProvider
       SendLocationResponseModel data = SendLocationResponseModel.fromJson(response.data);
       if(data.result == true){
         if(checkedInText == "Punch-In"){
-          //sendLocationToServer("IY01482", "DAMAC", "Y");
           showText = true;
           _checkIn(context);
           checkedInText = "Punch-Out";
           checkedInTextDate = 'Punched In Damac Executive heights \n' + currentDate + " " + currentTime;
           changeName(checkedInText,checkedInTextDate);
         }else if(checkedInText == "Punch-Out"){
-          //sendLocationToServer("IY01482", "DAMAC", "");
           showText = true;
           _checkIn(context);
           checkedInTextDate = 'Punched Out Damac Executive heights \n' + currentDate + " " + currentTime;

@@ -7,6 +7,7 @@ import 'package:timeline_tile/timeline_tile.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../Colours.dart';
 import '../model/profile/viewprofile.dart';
+import 'PdfView.dart';
 
 class ViewProfile extends StatelessWidget {
   const ViewProfile({super.key});
@@ -41,6 +42,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
   String userPassport = "";
   String userMedical = "";
   String userPhoto = "";
+  String empId = "";
   bool isVisibleProfile = true;
   bool isVisibleDoc = false;
 
@@ -55,9 +57,9 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
     setState(() {
       isLoading = true;
       final String token = prefs.getString('token').toString();
-      final String userName = prefs.getString('username').toString();
+      empId = prefs.getString('username').toString();
       print(token);
-      Profile(userName,token);
+      Profile(empId,token);
     });
   }
 
@@ -317,6 +319,52 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
+                        empId,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'Montserrat',
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 1), // Add some space between the text widgets
+                      Text(
+                        "Employee Id",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontFamily: 'Montserrat',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                    ],
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 1.0),
+                ),
+              )
+          ),
+          InkWell(
+              child: TimelineTile(
+                alignment: TimelineAlign.start,
+                lineXY: 0.7, // Adjust the position of the line if needed
+                afterLineStyle: const LineStyle(
+                  color: ColorConstants.kPrimaryColor, // Change the line color here
+                  thickness: 1, // Adjust the line thickness
+                ),
+                isFirst: true,
+                indicatorStyle: IndicatorStyle(
+                  width: 22,
+                  color: ColorConstants.kPrimaryColor,
+                ),
+                endChild: Container(
+                  margin: EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
                         userDepartment,
                         style: TextStyle(
                           color: Colors.black,
@@ -447,22 +495,26 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
 
   Widget viewDocument(){
     return Container(
-      padding: EdgeInsets.fromLTRB(10.0,10.0,10.0,0.0),
+      padding: EdgeInsets.fromLTRB(10.0,5.0,10.0,0.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           InkWell(
               onTap: () => {
                 if(userEmirateId.isNotEmpty){
-    ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('No File',
-    style: TextStyle(color: Colors.black),),
-    backgroundColor: ColorConstants.kPrimaryColor,)
-    )
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PdfView(base64String: userEmirateId),
+                    ),
+                  ),
                 }else{
-    _launchURL(userEmirateId)
-    }
-
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('No File',
+                        style: TextStyle(color: Colors.black),),
+                        backgroundColor: ColorConstants.kPrimaryColor,)
+                  )
+                }
               },
               child: TimelineTile(
                 alignment: TimelineAlign.start,
@@ -501,9 +553,9 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                       ),
                       SizedBox(height: 4),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(10.0,10.0,0.0,10.0),
+                    padding: EdgeInsets.fromLTRB(10.0,5.0,0.0,10.0),
                     child : Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           "VIEW",
@@ -514,7 +566,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
+                        /*Text(
                           "DOWNLOAD",
                           style: TextStyle(
                             color: ColorConstants.kPrimaryColor,
@@ -522,7 +574,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
-                        ),
+                        ),*/
                       ]
                     )
                   )
@@ -536,13 +588,18 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
           InkWell(
             onTap: () => {
               if(userMedical.isNotEmpty){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PdfView(base64String: userMedical),
+                  ),
+                ),
+              }else{
                 ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('No File',
                       style: TextStyle(color: Colors.black),),
                       backgroundColor: ColorConstants.kPrimaryColor,)
                 )
-              }else{
-                _launchURL(userMedical)
               }
             },
             child: TimelineTile(
@@ -587,7 +644,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                       Padding(
                           padding: EdgeInsets.fromLTRB(10.0,5.0,0.0,10.0),
                           child : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   "VIEW",
@@ -598,7 +655,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Text(
+                                /*Text(
                                   "DOWNLOAD",
                                   style: TextStyle(
                                     color: ColorConstants.kPrimaryColor,
@@ -606,7 +663,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                   ),
-                                ),
+                                ),*/
                               ]
                           )
                       )
@@ -620,15 +677,19 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
           InkWell(
             onTap: () => {
               if(userPassport.isNotEmpty){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PdfView(base64String: userPassport),
+                  ),
+                ),
+              }else{
                 ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('No File',
                       style: TextStyle(color: Colors.black),),
                       backgroundColor: ColorConstants.kPrimaryColor,)
                 )
-              }else{
-                _launchURL(userPassport)
               }
-
             },
             child: TimelineTile(
               alignment: TimelineAlign.start,
@@ -657,9 +718,9 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: EdgeInsets.fromLTRB(10.0,10.0,0.0,10.0),
+                        padding: EdgeInsets.fromLTRB(10.0,5.0,0.0,10.0),
                         child: Text(
-                          "Visa.pdf",
+                          "Passport.pdf",
                           style: TextStyle(
                             color: Colors.black,
                             fontFamily: 'Montserrat',
@@ -670,9 +731,9 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                       ),
                       SizedBox(height: 4),
                       Padding(
-                          padding: EdgeInsets.fromLTRB(10.0,10.0,0.0,10.0),
+                          padding: EdgeInsets.fromLTRB(10.0,5.0,0.0,10.0),
                           child : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   "VIEW",
@@ -683,7 +744,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Text(
+                                /*Text(
                                   "DOWNLOAD",
                                   style: TextStyle(
                                     color: ColorConstants.kPrimaryColor,
@@ -691,7 +752,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                   ),
-                                ),
+                                ),*/
                               ]
                           )
                       )
@@ -705,13 +766,18 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
           InkWell(
             onTap: () => {
               if(userVisa.isNotEmpty){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PdfView(base64String: userVisa),
+                  ),
+                ),
+              }else{
                 ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('No File',
                       style: TextStyle(color: Colors.black),),
                       backgroundColor: ColorConstants.kPrimaryColor,)
                 )
-              }else{
-                _launchURL(userVisa)
               }
             },
             child: TimelineTile(
@@ -744,7 +810,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                       Padding(
                         padding: EdgeInsets.fromLTRB(10.0,5.0,0.0,10.0),
                         child: Text(
-                          "Passport.pdf",
+                          "Visa.pdf",
                           style: TextStyle(
                             color: Colors.black,
                             fontFamily: 'Montserrat',
@@ -757,7 +823,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                       Padding(
                           padding: EdgeInsets.fromLTRB(10.0,5.0,0.0,10.0),
                           child : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   "VIEW",
@@ -768,7 +834,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Text(
+                               /* Text(
                                   "DOWNLOAD",
                                   style: TextStyle(
                                     color: ColorConstants.kPrimaryColor,
@@ -776,7 +842,7 @@ class _ViewProfileState extends State<ViewProfileExample> with TickerProviderSta
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                   ),
-                                ),
+                                ),*/
                               ]
                           )
                       )
